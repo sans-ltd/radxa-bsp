@@ -3,7 +3,7 @@ FROM debian:bullseye
 RUN dpkg --add-architecture arm64 && \
     apt-get update && \
     apt-get full-upgrade --no-install-recommends -y \
-        build-essential crossbuild-essential-arm64 gcc-arm-none-eabi git ruby sudo apt-utils \
+        build-essential crossbuild-essential-arm64 gcc-arm-none-eabi git openssh-client ruby sudo apt-utils \
         python3 python2 python-is-python2 curl \
         python3-distutils python3-pkg-resources python3-setuptools python3-pyelftools \
         cpio bc flex fakeroot bison rsync kmod swig device-tree-compiler u-boot-tools \
@@ -14,3 +14,8 @@ RUN dpkg --add-architecture arm64 && \
     python2 -m pip install pyelftools && \
     adduser --gecos runner --disabled-password runner && \
     rm -rf /var/lib/apt/lists/*
+
+# add your ssh key pair here: ssh-keygen -f bsp/container/id_rsa
+ADD --chown=runner:runner --chmod=600 id_rsa /home/runner/.ssh/
+ADD --chown=runner:runner --chmod=600 id_rsa.pub /home/runner/.ssh/
+

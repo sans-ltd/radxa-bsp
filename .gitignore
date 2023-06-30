@@ -10,3 +10,5 @@
 /SOURCE
 /book
 *.bin
+container/id_rsa.pub
+container/id_rsa
