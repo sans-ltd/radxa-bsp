@@ -39,6 +39,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Run BSP Build
         run: | 
+          git config --global --add safe.directory /__w/radxa-bsp/radxa-bsp
           ./bsp --native-build --revision 13 linux rockchip  
           mkdir dist
           mv linux-headers-*_arm64.deb dist
