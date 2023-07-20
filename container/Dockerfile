@@ -16,6 +16,6 @@ RUN dpkg --add-architecture arm64 && \
     rm -rf /var/lib/apt/lists/*
 
 # add your ssh key pair here: ssh-keygen -f bsp/container/id_rsa
-ADD --chown=runner:runner --chmod=600 id_rsa /home/runner/.ssh/
-ADD --chown=runner:runner --chmod=600 id_rsa.pub /home/runner/.ssh/
+# ADD --chown=runner:runner --chmod=600 id_rsa /home/runner/.ssh/
+# ADD --chown=runner:runner --chmod=600 id_rsa.pub /home/runner/.ssh/
 
