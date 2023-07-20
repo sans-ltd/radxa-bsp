@@ -1,6 +1,6 @@
 name: Build
 env:
-  REVISION: 13
+  REVISION: 12
 on:
   push:
     branches: [ "rockpi-4-kernel5.10.110" ]
