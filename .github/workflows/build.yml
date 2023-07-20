@@ -1,70 +1,53 @@
 name: Build
 on:
-  schedule:
-    - cron:  '0 0 * * MON'
-  workflow_dispatch:
   push:
-    branches:
-      - main
-    paths-ignore:
-      - '**.md'
-      - .gitignore
-      - 'docs/**'
-      - 'theme/**'
-      - book.toml
-      - .github/workflows/docs.yaml
-      - container/Dockerfile
-      - .github/workflows/deploy-image.yaml
+    branches: [ "rockpi-4-kernel5.10.110" ]
   pull_request:
-    paths-ignore:
-      - '**.md'
-      - .gitignore
-      - 'docs/**'
-      - 'theme/**'
-      - book.toml
-      - .github/workflows/docs.yaml
-      - container/Dockerfile
-      - .github/workflows/deploy-image.yaml
+    branches: [ "rockpi-4-kernel5.10.110" ]
+
+  # workflow_dispatch:
+  # push:
+  #   branches:
+  #     - main
+  #   paths-ignore:
+  #     - '**.md'
+  #     - .gitignore
+  #     - 'docs/**'
+  #     - 'theme/**'
+  #     - book.toml
+  #     - .github/workflows/docs.yaml
+  #     - container/Dockerfile
+  #     - .github/workflows/deploy-image.yaml
+  # pull_request:
+  #   paths-ignore:
+  #     - '**.md'
+  #     - .gitignore
+  #     - 'docs/**'
+  #     - 'theme/**'
+  #     - book.toml
+  #     - .github/workflows/docs.yaml
+  #     - container/Dockerfile
+  #     - .github/workflows/deploy-image.yaml
 
 jobs:
-  query:
+  build_linux:
     runs-on: ubuntu-latest
-    outputs:
-      linux: ${{ steps.query.outputs.linux }}
-      u-boot: ${{ steps.query.outputs.u-boot }}
+    container:
+      image: sansltd/radxa-kernel-build
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Query available board configs
-        id: query
-        run: |
-          echo "linux=$(./bsp json edition linux)" >> $GITHUB_OUTPUT
-          echo "u-boot=$(./bsp json edition u-boot)" >> $GITHUB_OUTPUT
-  build_u-boot:
-    needs: query
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        targets: [ u-boot ]
-        editions: ${{fromJSON(needs.query.outputs.u-boot)}}
-    steps:
-      - name: Build
-        uses: radxa-repo/bsp@main
+      - name: Run BSP Build
+        run: | 
+          ./bsp --native-build --revision 13 linux rockchip  
+          mkdir dist
+          mv linux-headers-*_arm64.deb dist
+          mv linux-image-*_arm64.deb dist
+          mv linux-image-rock-4se_*.deb dist
+          mv ./linux/arch/arm64/boot/dts/rockchip/overlay/mipi-csi.dtbo dist
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
         with:
-          target: ${{ matrix.targets }}
-          edition: ${{ matrix.editions }}
-          artifacts: true
-  build_linux:
-    needs: query
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        targets: [ linux ]
-        editions: ${{fromJSON(needs.query.outputs.linux)}}
-    steps:
-      - name: Build
-        uses: radxa-repo/bsp@main
-        with:
-          target: ${{ matrix.targets }}
-          edition: ${{ matrix.editions }}
-          artifacts: true
+          name: debian-package
+          path: 
+            dist/*
