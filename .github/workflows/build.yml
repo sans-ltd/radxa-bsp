@@ -57,7 +57,7 @@ jobs:
           mv .output/linux-headers-*_arm64.deb dist
           mv .output/linux-image-*_arm64.deb dist
           mv .output/linux-image-rock-4se_*.deb dist
-          mv .src/linux/arch/arm64/boot/dts/rockchip/overlay/mipi-csi.dtbo dist
+          mv .src/linux/arch/arm64/boot/dts/rockchip/overlays/mipi-csi.dtbo dist
       - name: Archive production artifacts
         uses: actions/upload-artifact@v3
         with:
